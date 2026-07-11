@@ -184,35 +184,5 @@ namespace BMWConnectedApp.Pages
 
             return dlg;
         }
-
-        // Inline copy handler removed; copy is handled inside the dialog.
-
-        private static string GenerateCodeVerifier()
-        {
-            var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
-            var bytes = new byte[32];
-            rng.GetBytes(bytes);
-            return Base64UrlEncode(bytes);
-        }
-
-        private static string ComputeCodeChallenge(string codeVerifier)
-        {
-            using var sha256 = System.Security.Cryptography.SHA256.Create();
-            var bytes = System.Text.Encoding.ASCII.GetBytes(codeVerifier);
-            var hash = sha256.ComputeHash(bytes);
-            return Base64UrlEncode(hash);
-        }
-
-        private static string Base64UrlEncode(byte[] arg)
-        {
-            var s = Convert.ToBase64String(arg);
-            s = s.Split('=')[0]; // Remove any trailing '='s
-            s = s.Replace('+', '-'); // 62nd char of encoding
-            s = s.Replace('/', '_'); // 63rd char of encoding
-            return s;
-        }
-
-        // Legacy inline settings wiring removed. SettingsPage now uses a DI-resolved SettingsViewModel and
-        // the Save/Authorize handlers are wired in OnNavigatedTo to call into the ViewModel.
     }
 }
