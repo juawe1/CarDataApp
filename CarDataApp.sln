@@ -1,0 +1,31 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bmw.Dashboard.Core", "Bmw.Dashboard.Core\Bmw.Dashboard.Core.csproj", "{CC860BD7-23D6-46EA-832D-63B50226DDF6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bmw.Dashboard.Tests", "Bmw.Dashboard.Tests\Bmw.Dashboard.Tests.csproj", "{398072DD-F74A-4515-AC4E-5D4C7B3A2D0E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BMWConnectedApp", "BMWConnectedApp\BMWConnectedApp.csproj", "{EF3DE59E-E80B-4397-B4ED-69DF89CDBC3D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CC860BD7-23D6-46EA-832D-63B50226DDF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC860BD7-23D6-46EA-832D-63B50226DDF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC860BD7-23D6-46EA-832D-63B50226DDF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC860BD7-23D6-46EA-832D-63B50226DDF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{398072DD-F74A-4515-AC4E-5D4C7B3A2D0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{398072DD-F74A-4515-AC4E-5D4C7B3A2D0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{398072DD-F74A-4515-AC4E-5D4C7B3A2D0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{398072DD-F74A-4515-AC4E-5D4C7B3A2D0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF3DE59E-E80B-4397-B4ED-69DF89CDBC3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF3DE59E-E80B-4397-B4ED-69DF89CDBC3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF3DE59E-E80B-4397-B4ED-69DF89CDBC3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF3DE59E-E80B-4397-B4ED-69DF89CDBC3D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
