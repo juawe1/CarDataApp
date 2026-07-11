@@ -8,10 +8,6 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System;
 
 namespace Bmw.Dashboard.Core.Services;
 
@@ -22,6 +18,7 @@ public class BmwApiService : IBmwApiService
     private readonly BmwApiOptions _options;
     private readonly ILogger<BmwApiService> _logger;
     private const string baseUrl = "https://api-cardata.bmwgroup.com/";
+    private string _clientId => _settings.ClientId ?? _options.ClientId;
 
     public BmwApiService(HttpClient httpClient, ISettingsService settingsService, IOptions<BmwApiOptions> options, ILogger<BmwApiService> logger)
     {
@@ -35,18 +32,15 @@ public class BmwApiService : IBmwApiService
     {
         using var client = new HttpClient();
 
-        var parameters = new List<KeyValuePair<string, string>>
-        {
+        var body = new FormUrlEncodedContent([
             new KeyValuePair<string, string>("grant_type", "refresh_token"),
             new KeyValuePair<string, string>("refresh_token", refreshToken),
-            new KeyValuePair<string, string>("client_id", _options.ClientId)
-        };
-
-        var content = new FormUrlEncodedContent(parameters);
+            new KeyValuePair<string, string>("client_id", _clientId)
+        ]);
 
         try
         {
-            var response = await client.PostAsync("https://customer.bmwgroup.com/gcdm/oauth/token", content);
+            var response = await client.PostAsync("https://customer.bmwgroup.com/gcdm/oauth/token", body);
 
             if (response.IsSuccessStatusCode)
             {
@@ -68,16 +62,16 @@ public class BmwApiService : IBmwApiService
     public async Task<DeviceCodeResponse?> GetDeviceCodeAsync(string challenge)
     {
         var uri = "https://customer.bmwgroup.com/gcdm/oauth/device/code";
-        Debug.WriteLine($"GetDeviceCodeAsync start; uri={uri}; challengeLen={challenge?.Length ?? 0}");
+        Debug.WriteLine($"GetDeviceCodeAsync start; uri={uri}; challengeLen={challenge.Length}");
 
-        var body = new FormUrlEncodedContent(new[]
-        {
-            new KeyValuePair<string, string>("client_id", _settings.ClientId ?? _options.ClientId),
+        var body = new FormUrlEncodedContent(
+        [
+            new KeyValuePair<string, string>("client_id", _clientId),
             new KeyValuePair<string, string>("response_type", "device_code"),
             new KeyValuePair<string, string>("scope", "authenticate_user openid cardata:api:read cardata:streaming:read"),
             new KeyValuePair<string, string>("code_challenge", challenge),
             new KeyValuePair<string, string>("code_challenge_method", "S256"),
-        });
+        ]);
 
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
         try
@@ -105,13 +99,13 @@ public class BmwApiService : IBmwApiService
     public async Task<HttpResponseMessage> GetTokenAsync(string deviceCode, string codeVerifier)
     {
         var uri = "https://customer.bmwgroup.com/gcdm/oauth/token";
-        var body = new FormUrlEncodedContent(new[]
-        {
+        var body = new FormUrlEncodedContent(
+        [
             new KeyValuePair<string, string>("grant_type", "urn:ietf:params:oauth:grant-type:device_code"),
-            new KeyValuePair<string, string>("client_id", _settings.ClientId ?? _options.ClientId),
+            new KeyValuePair<string, string>("client_id", _clientId),
             new KeyValuePair<string, string>("device_code", deviceCode),
             new KeyValuePair<string, string>("code_verifier", codeVerifier),
-        });
+        ]);
 
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
         try
@@ -233,26 +227,6 @@ public class BmwApiService : IBmwApiService
             var errorBody = await response.Content.ReadAsStringAsync();
             _logger.LogError("Failed to get vehicle mappings. Status: {StatusCode}, Body: {ErrorBody}", response.StatusCode, errorBody);
             throw new Exception($"Failed to get vehicle mappings. Status: {response.StatusCode}, Body: {errorBody}");
-        }
-    }
-
-    // Diagnostics helper
-    public async Task<bool> TestConnectivityAsync(string? url = null)
-    {
-        var testUrl = url ?? "https://www.bing.com/";
-        Debug.WriteLine($"TestConnectivityAsync -> {testUrl}");
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-        try
-        {
-            var res = await _http.GetAsync(testUrl, cts.Token).ConfigureAwait(false);
-            Debug.WriteLine($"Connectivity test status: {res.StatusCode}");
-            return res.IsSuccessStatusCode;
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Connectivity test failed: {ex.Message}");
-            _logger?.LogError(ex, "Connectivity test failed");
-            return false;
         }
     }
 }
