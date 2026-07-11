@@ -1,7 +1,6 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
+# Visual Studio Version 18
+VisualStudioVersion = 18.8.11925.187 insiders
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bmw.Dashboard.Core", "Bmw.Dashboard.Core\Bmw.Dashboard.Core.csproj", "{CC860BD7-23D6-46EA-832D-63B50226DDF6}"
 EndProject
@@ -20,12 +19,18 @@ Global
 		{CC860BD7-23D6-46EA-832D-63B50226DDF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC860BD7-23D6-46EA-832D-63B50226DDF6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{398072DD-F74A-4515-AC4E-5D4C7B3A2D0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{398072DD-F74A-4515-AC4E-5D4C7B3A2D0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{398072DD-F74A-4515-AC4E-5D4C7B3A2D0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{398072DD-F74A-4515-AC4E-5D4C7B3A2D0E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EF3DE59E-E80B-4397-B4ED-69DF89CDBC3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EF3DE59E-E80B-4397-B4ED-69DF89CDBC3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF3DE59E-E80B-4397-B4ED-69DF89CDBC3D}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{EF3DE59E-E80B-4397-B4ED-69DF89CDBC3D}.Debug|Any CPU.Build.0 = Debug|x86
+		{EF3DE59E-E80B-4397-B4ED-69DF89CDBC3D}.Debug|Any CPU.Deploy.0 = Debug|x86
 		{EF3DE59E-E80B-4397-B4ED-69DF89CDBC3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF3DE59E-E80B-4397-B4ED-69DF89CDBC3D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1AA4885B-4E6D-463E-B0F7-3F40FCBD0D36}
 	EndGlobalSection
 EndGlobal
