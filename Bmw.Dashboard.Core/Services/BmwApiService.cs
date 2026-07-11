@@ -112,7 +112,7 @@ public class BmwApiService : IBmwApiService
         {
             Debug.WriteLine("Posting token request to " + uri);
             _logger?.LogDebug("Posting token request to {Uri}", uri);
-            using var response = await _http.PostAsync(uri, body, cts.Token).ConfigureAwait(false);
+            var response = await _http.PostAsync(uri, body, cts.Token).ConfigureAwait(false);
             _logger?.LogDebug("Token request returned {Status}", response.StatusCode);
             return response;
         }
