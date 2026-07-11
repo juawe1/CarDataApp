@@ -12,4 +12,5 @@ public interface ISyncService
     //car data methods
     Task<string> GetCarData();
     Task<IEnumerable<VehicleMappingResponse>> GetVehicleMappings();
+    Task<string?> GetOrFetchVehicleImagePathAsync(string vin);
 }

@@ -59,6 +59,7 @@ public partial class App : Application
 
             services.AddHttpClient<IBmwApiService, BmwApiService>();
             services.AddSingleton<ISettingsService, SettingsService>();
+            services.AddSingleton<IVehicleImageService, VehicleImageService>();
             services.AddSingleton<DataSyncService>();
             services.AddTransient<DashboardViewModel>();
             // Register SettingsViewModel so pages can resolve it via DI

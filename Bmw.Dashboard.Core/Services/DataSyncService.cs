@@ -4,7 +4,7 @@ using Bmw.Dashboard.Core.Models.API;
 
 namespace Bmw.Dashboard.Core.Services;
 
-public class DataSyncService(IBmwApiService api, IPasswordVaultService passwordVaultService) : ISyncService
+public class DataSyncService(IBmwApiService api, IPasswordVaultService passwordVaultService, IVehicleImageService vehicleImageService) : ISyncService
 {
     public string? CachedAccessToken { get; set; }
     private string? _currentVerifier;
@@ -62,5 +62,11 @@ public class DataSyncService(IBmwApiService api, IPasswordVaultService passwordV
         if (CachedAccessToken is null) return [];
         var response = await api.GetVehicleMappings(CachedAccessToken);
         return response;
+    }
+
+    public async Task<string?> GetOrFetchVehicleImagePathAsync(string vin)
+    {
+        if (string.IsNullOrWhiteSpace(CachedAccessToken)) return null;
+        return await vehicleImageService.GetOrFetchImagePathAsync(CachedAccessToken, vin);
     }
 }

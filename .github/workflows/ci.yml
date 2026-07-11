@@ -28,33 +28,14 @@ jobs:
           restore-keys: |
             nuget-${{ runner.os }}-
 
-      - name: Restore
-        shell: pwsh
-        run: |
-          $slnFiles = Get-ChildItem -Path . -Recurse -Filter '*.sln' -ErrorAction SilentlyContinue
-          if ($slnFiles) {
-            foreach ($sln in $slnFiles) { dotnet restore $sln.FullName }
-          } else {
-            dotnet restore
-          }
+      - name: Restore Core
+        run: dotnet restore Bmw.Dashboard.Core/Bmw.Dashboard.Core.csproj
 
-      - name: Build
-        shell: pwsh
-        run: |
-          $slnFiles = Get-ChildItem -Path . -Recurse -Filter '*.sln' -ErrorAction SilentlyContinue
-          if ($slnFiles) {
-            foreach ($sln in $slnFiles) { dotnet build $sln.FullName --configuration Release --no-restore }
-          } else {
-            dotnet build --configuration Release --no-restore
-          }
+      - name: Restore Tests
+        run: dotnet restore Bmw.Dashboard.Tests/Bmw.Dashboard.Tests.csproj
+
+      - name: Build Core
+        run: dotnet build Bmw.Dashboard.Core/Bmw.Dashboard.Core.csproj --configuration Release --no-restore
 
       - name: Run tests
-        shell: pwsh
-        run: |
-          $tests = Get-ChildItem -Path . -Recurse -Filter '*Tests.csproj' -ErrorAction SilentlyContinue
-          if ($tests) {
-            foreach ($t in $tests) { dotnet test $t.FullName --configuration Release --no-build --verbosity normal }
-          }
-          else {
-            Write-Host "No test projects found."
-          }
+        run: dotnet test Bmw.Dashboard.Tests/Bmw.Dashboard.Tests.csproj --configuration Release --no-restore --verbosity normal

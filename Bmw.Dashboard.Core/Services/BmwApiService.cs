@@ -40,7 +40,7 @@ public class BmwApiService : IBmwApiService
 
         try
         {
-            var response = await client.PostAsync("https://customer.bmwgroup.com/gcdm/oauth/token", body);
+            using var response = await client.PostAsync("https://customer.bmwgroup.com/gcdm/oauth/token", body);
 
             if (response.IsSuccessStatusCode)
             {
@@ -78,7 +78,7 @@ public class BmwApiService : IBmwApiService
         {
             Debug.WriteLine("Posting device code request to " + uri);
             _logger?.LogDebug("Posting device code request to {Uri}", uri);
-            var response = await _http.PostAsync(uri, body, cts.Token).ConfigureAwait(false);
+            using var response = await _http.PostAsync(uri, body, cts.Token).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<DeviceCodeResponse>(cancellationToken: cts.Token).ConfigureAwait(false);
         }
@@ -136,7 +136,7 @@ public class BmwApiService : IBmwApiService
         {
             await Task.Delay(TimeSpan.FromSeconds(interval));
 
-            var response = await GetTokenAsync(deviceCode, codeVerifier);
+            using var response = await GetTokenAsync(deviceCode, codeVerifier);
 
             if (response.IsSuccessStatusCode)
             {
@@ -185,7 +185,7 @@ public class BmwApiService : IBmwApiService
         // REQUIRED: Add the language header
         request.Headers.Add("X-Language", "en-GB");
 
-        var response = await _http.SendAsync(request);
+        using var response = await _http.SendAsync(request);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -208,7 +208,7 @@ public class BmwApiService : IBmwApiService
         request.Headers.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) BmwDashboard/1.0");
         request.Headers.Add("X-Language", "en-GB");
 
-        var response = await _http.SendAsync(request);
+        using var response = await _http.SendAsync(request);
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -227,6 +227,36 @@ public class BmwApiService : IBmwApiService
             var errorBody = await response.Content.ReadAsStringAsync();
             _logger.LogError("Failed to get vehicle mappings. Status: {StatusCode}, Body: {ErrorBody}", response.StatusCode, errorBody);
             throw new Exception($"Failed to get vehicle mappings. Status: {response.StatusCode}, Body: {errorBody}");
+        }
+    }
+
+    public async Task<byte[]?> GetVehicleImageAsync(string accessToken, string vin)
+    {
+        string normalisedVin = vin.Trim().ToUpperInvariant();
+
+        var fullUrl = $"{baseUrl}customers/vehicles/{Uri.EscapeDataString(normalisedVin)}/image";
+        using var request = new HttpRequestMessage(HttpMethod.Get, fullUrl);
+
+        request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {accessToken}");
+        request.Headers.Add("x-version", "v1");
+        request.Headers.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) BmwDashboard/1.0");
+        request.Headers.Add("X-Language", "en-GB");
+
+        try
+        {
+            using var response = await _http.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadAsByteArrayAsync();
+
+            var errorBody = await response.Content.ReadAsStringAsync();
+            _logger.LogError("Failed to get vehicle image. Status: {StatusCode}, Body: {ErrorBody}", response.StatusCode, errorBody);
+            response.Dispose();
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching vehicle image for VIN {Vin}", vin);
+            return null;
         }
     }
 }
