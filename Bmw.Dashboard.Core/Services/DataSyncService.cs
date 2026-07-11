@@ -66,7 +66,7 @@ public class DataSyncService(IBmwApiService api, IPasswordVaultService passwordV
 
     public async Task<string?> GetOrFetchVehicleImagePathAsync(string vin)
     {
-        if (CachedAccessToken is null) return null;
+        if (string.IsNullOrWhiteSpace(CachedAccessToken)) return null;
         return await vehicleImageService.GetOrFetchImagePathAsync(CachedAccessToken, vin);
     }
 }
