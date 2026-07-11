@@ -29,12 +29,24 @@ jobs:
             nuget-${{ runner.os }}-
 
       - name: Restore
+        shell: pwsh
         run: |
-          dotnet restore "**/*.sln" || dotnet restore
+          $slnFiles = Get-ChildItem -Path . -Recurse -Filter '*.sln' -ErrorAction SilentlyContinue
+          if ($slnFiles) {
+            foreach ($sln in $slnFiles) { dotnet restore $sln.FullName }
+          } else {
+            dotnet restore
+          }
 
       - name: Build
+        shell: pwsh
         run: |
-          dotnet build "**/*.sln" --configuration Release --no-restore
+          $slnFiles = Get-ChildItem -Path . -Recurse -Filter '*.sln' -ErrorAction SilentlyContinue
+          if ($slnFiles) {
+            foreach ($sln in $slnFiles) { dotnet build $sln.FullName --configuration Release --no-restore }
+          } else {
+            dotnet build --configuration Release --no-restore
+          }
 
       - name: Run tests
         shell: pwsh
