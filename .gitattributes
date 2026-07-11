@@ -1,0 +1,12 @@
+* text=auto
+*.xaml text eol=crlf
+*.cs text eol=crlf
+*.json text eol=lf
+*.md text eol=lf
+
+# Treat generated files as binary
+*.png binary
+*.jpg binary
+
+# Ensure .sh files have LF
+*.sh text eol=lf
