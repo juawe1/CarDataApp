@@ -1,0 +1,14 @@
+E:\Source Code\Bmw.Dashboard.Core\bin\Debug\net8.0\Bmw.Dashboard.Core.deps.json
+E:\Source Code\Bmw.Dashboard.Core\bin\Debug\net8.0\Bmw.Dashboard.Core.runtimeconfig.json
+E:\Source Code\Bmw.Dashboard.Core\bin\Debug\net8.0\Bmw.Dashboard.Core.dll
+E:\Source Code\Bmw.Dashboard.Core\bin\Debug\net8.0\Bmw.Dashboard.Core.pdb
+E:\Source Code\Bmw.Dashboard.Core\obj\Debug\net8.0\Bmw.Dashboard.Core.csproj.AssemblyReference.cache
+E:\Source Code\Bmw.Dashboard.Core\obj\Debug\net8.0\Bmw.Dashboard.Core.GeneratedMSBuildEditorConfig.editorconfig
+E:\Source Code\Bmw.Dashboard.Core\obj\Debug\net8.0\Bmw.Dashboard.Core.AssemblyInfoInputs.cache
+E:\Source Code\Bmw.Dashboard.Core\obj\Debug\net8.0\Bmw.Dashboard.Core.AssemblyInfo.cs
+E:\Source Code\Bmw.Dashboard.Core\obj\Debug\net8.0\Bmw.Dashboard.Core.csproj.CoreCompileInputs.cache
+E:\Source Code\Bmw.Dashboard.Core\obj\Debug\net8.0\Bmw.Dashboard.Core.dll
+E:\Source Code\Bmw.Dashboard.Core\obj\Debug\net8.0\refint\Bmw.Dashboard.Core.dll
+E:\Source Code\Bmw.Dashboard.Core\obj\Debug\net8.0\Bmw.Dashboard.Core.pdb
+E:\Source Code\Bmw.Dashboard.Core\obj\Debug\net8.0\Bmw.Dashboard.Core.genruntimeconfig.cache
+E:\Source Code\Bmw.Dashboard.Core\obj\Debug\net8.0\ref\Bmw.Dashboard.Core.dll

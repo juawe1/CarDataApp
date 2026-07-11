@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "BMWConnectedApp (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "BMWConnectedApp (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

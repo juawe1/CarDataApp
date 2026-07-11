@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="BMWConnectedApp.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BMWConnectedApp"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    Title="128ti Connected Dashboard">
+
+    <!-- The Mica Backdrop is fine here, but if it still fails, move it below -->
+    <Window.SystemBackdrop>
+        <MicaBackdrop Kind="Base" />
+    </Window.SystemBackdrop>
+
+    <!-- Root UI Element -->
+    <NavigationView x:Name="RootNav" PaneDisplayMode="LeftCompact"
+                    ItemInvoked="RootNav_ItemInvoked" BackRequested="RootNav_BackRequested">
+
+        <NavigationView.MenuItems>
+            <NavigationViewItem x:Name="HomeNavItem" Content="Home">
+                <NavigationViewItem.Icon>
+                    <SymbolIcon Symbol="Home" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+        </NavigationView.MenuItems>
+
+        <Frame x:Name="ContentFrame" />
+    </NavigationView>
+</Window>

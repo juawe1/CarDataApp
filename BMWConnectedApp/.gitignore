@@ -1,0 +1,97 @@
+# Visual Studio / .NET generated files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build artifacts
+bin/
+obj/
+out/
+
+# Visual C++ generated files
+*.VC.db
+*.VC.opendb
+
+# Rider
+.idea/
+*.sln.iml
+
+# VS Code
+.vscode/
+
+# NuGet
+packages/
+*.nupkg
+project.lock.json
+project.fragment.lock.json
+# The global packages folder can be ignored, but be careful if you commit it intentionally
+**/packages/*
+
+# Logs
+*.log
+
+# Publish output
+/publish/
+
+# Test results
+TestResults/
+*.trx
+*.coverage
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.old
+*.orig
+
+# OS generated files
+Thumbs.db
+Desktop.ini
+
+# Secrets / certificates
+# Don't commit private keys, pfx files or keys
+*.pfx
+*.p12
+*.key
+*.pem
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal
+*.db-journal
+
+# User-specific appsettings / local overrides
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+# Dotnet user secrets folder (not inside repo but safe to ignore if present)
+*.usersecrets
+
+# Rider temporary files
+.idea/
+*.sln.iml
+
+# Coverage / profiling
+coverage/
+coverage*.xml
+
+# Generated XAML files and intermediate XBF/XAML caches (build output already covered by obj/)
+*.xbm
+*.xbf
+
+# Dependency directories created by some package managers
+node_modules/
+
+# JetBrains ReSharper
+_ReSharper*/
+*.DotSettings.user
+
+# Keep the repo clean: you should NOT commit any actual client IDs, client secrets, refresh tokens or access tokens.
+# Use environment variables, dotnet user-secrets, or CI secret stores for sensitive configuration.
