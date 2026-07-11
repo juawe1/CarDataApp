@@ -229,4 +229,31 @@ public class BmwApiService : IBmwApiService
             throw new Exception($"Failed to get vehicle mappings. Status: {response.StatusCode}, Body: {errorBody}");
         }
     }
+
+    public async Task<byte[]?> GetVehicleImageAsync(string accessToken, string vin)
+    {
+        var fullUrl = $"{baseUrl}customers/vehicles/{vin}/image";
+        using var request = new HttpRequestMessage(HttpMethod.Get, fullUrl);
+
+        request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {accessToken}");
+        request.Headers.Add("x-version", "v1");
+        request.Headers.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) BmwDashboard/1.0");
+        request.Headers.Add("X-Language", "en-GB");
+
+        try
+        {
+            var response = await _http.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadAsByteArrayAsync();
+
+            var errorBody = await response.Content.ReadAsStringAsync();
+            _logger.LogError("Failed to get vehicle image. Status: {StatusCode}, Body: {ErrorBody}", response.StatusCode, errorBody);
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching vehicle image for VIN {Vin}", vin);
+            return null;
+        }
+    }
 }
