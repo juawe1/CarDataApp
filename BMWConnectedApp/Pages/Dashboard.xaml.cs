@@ -8,12 +8,9 @@ namespace BMWConnectedApp.Pages
     public sealed partial class DashboardPage : Page
     {
         // Make this public so the XAML {x:Bind} can see it
-        public DashboardViewModel ViewModel { get; private set; }
+        public DashboardViewModel? ViewModel { get; private set; }
 
-        public DashboardPage()
-        {
-            this.InitializeComponent();
-        }
+        public DashboardPage() => this.InitializeComponent();
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
@@ -22,7 +19,7 @@ namespace BMWConnectedApp.Pages
             if (e.Parameter is DashboardViewModel vm)
             {
                 ViewModel = vm;
-                this.DataContext = ViewModel; // sets {x:Bind} and traditional bindings
+                DataContext = ViewModel; // sets {x:Bind} and traditional bindings
             }
         }
     }

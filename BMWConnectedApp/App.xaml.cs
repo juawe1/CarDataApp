@@ -5,15 +5,12 @@ using Bmw.Dashboard.Core.Services;
 using Bmw.Dashboard.Core.ViewModels;
 using BMWConnectedApp.Pages;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using System;
 using System.IO;
-using WinRT.BMWConnectedAppVtableClasses;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -26,7 +23,7 @@ namespace BMWConnectedApp;
 public partial class App : Application
 {
     public static IHost AppHost { get; private set; } = default!;
-
+    // Configuration is provided by the host builder; no static user-secrets configuration here.
     /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code
     /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -34,7 +31,7 @@ public partial class App : Application
     public App()
     {
         this.InitializeComponent();
-
+        // Do not load user-secrets here; settings are loaded through the Host configuration and the app database.
         // Build the generic host and register services. Heavy initialization that requires
         // the DI container (like ensuring DB creation or loading settings) will be performed
         // asynchronously in OnLaunched so startup remains async-friendly.
@@ -64,6 +61,8 @@ public partial class App : Application
             services.AddSingleton<ISettingsService, SettingsService>();
             services.AddSingleton<DataSyncService>();
             services.AddTransient<DashboardViewModel>();
+            // Register SettingsViewModel so pages can resolve it via DI
+            services.AddTransient<Bmw.Dashboard.Core.ViewModels.SettingsViewModel>();
             services.AddTransient<SettingsPage>();
             services.AddSingleton<IPasswordVaultService, PasswordVaultService>();
         }).Build();
@@ -76,12 +75,12 @@ public partial class App : Application
         };
     }
 
-    public static T GetService<T>() where T : class => AppHost.Services.GetService(typeof(T)) as T;
+    public static T GetService<T>() where T : class => AppHost.Services.GetRequiredService<T>();
     /// <summary>
     /// Invoked when the application is launched.
     /// </summary>
     /// <param name="args">Details about the launch request and process.</param>
-    protected override async void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+    protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
         try
         {
@@ -93,18 +92,6 @@ public partial class App : Application
             // Load settings into cache
             var settingsService = scope.ServiceProvider.GetRequiredService<Bmw.Dashboard.Core.Interfaces.ISettingsService>();
             await settingsService.LoadAsync();
-
-            // Quick connectivity test using the API service to help diagnose hangs
-            try
-            {
-                var api = scope.ServiceProvider.GetRequiredService<Bmw.Dashboard.Core.Interfaces.IBmwApiService>();
-                var ok = await api.TestConnectivityAsync();
-                System.Diagnostics.Debug.WriteLine($"Connectivity test result: {ok}");
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Connectivity test error: {ex.Message}");
-            }
         }
         catch (Exception ex)
         {
@@ -116,18 +103,6 @@ public partial class App : Application
         m_window.Activate();
     }
 
-    public static bool TryGoBack()
-    {
-        Frame? rootFrame = Window.Content as Frame;
-        if(rootFrame == null) return false;
-        if(rootFrame.CanGoBack)
-        {
-            rootFrame.GoBack();
-            return true;
-        }
-        return false;
-    }
-
     public static Window Window { get { return m_window; } }
-    private static Window m_window;
+    private static Window m_window = default!;
 }

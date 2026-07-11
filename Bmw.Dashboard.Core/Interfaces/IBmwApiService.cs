@@ -10,9 +10,6 @@ public interface IBmwApiService
     Task<TokenResponse?> PollForTokenAsync(string deviceCode, string codeVerifier, int interval);
     Task<TokenResponse?> GetAccessTokenFromRefresh(string refreshToken);
 
-    // For diagnostics: quick connectivity test
-    Task<bool> TestConnectivityAsync(string? url = null);
-
     //car data methods
     Task<string> GetCarData(string accessToken);
     Task<IEnumerable<VehicleMappingResponse>> GetVehicleMappings(string accessToken);

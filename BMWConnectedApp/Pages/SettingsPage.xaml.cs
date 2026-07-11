@@ -1,114 +1,84 @@
-﻿using Bmw.Dashboard.Core.Data.DbContexts;
-using Bmw.Dashboard.Core.Data.Entities;
-using Bmw.Dashboard.Core.Interfaces;
-using Bmw.Dashboard.Core.Models.API;
+﻿using Bmw.Dashboard.Core.Data.Entities;
 using Microsoft.UI.Xaml.Controls;
 using System.Linq;
 using Microsoft.UI.Xaml;
 using System;
+using Bmw.Dashboard.Core.ViewModels;
 
 namespace BMWConnectedApp.Pages
 {
     public sealed partial class SettingsPage : Page
     {
-        public UserConfigEntity UserConfig { get; private set; }
+        public UserConfigEntity? UserConfig { get; private set; }
 
-        public SettingsPage()
+        private SettingsViewModel? _viewModel;
+        private ContentDialog? _verificationDialog;
+
+        public SettingsPage() => this.InitializeComponent();
+
+        protected override async void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
         {
-            this.InitializeComponent();
+            base.OnNavigatedTo(e);
+
+            // Resolve the DI-resolved SettingsViewModel and bind it
+            _viewModel = App.GetService<SettingsViewModel>();
+            if (_viewModel != null)
+            {
+                this.DataContext = _viewModel;
+                _viewModel.PropertyChanged += ViewModel_PropertyChanged;
+                await _viewModel.LoadAsync();
+            }
+
+            // Wire simple button handlers to call into the ViewModel commands/methods
+            SaveButton.Click += async (s, ev) =>
+            {
+                if (_viewModel != null)
+                {
+                    await _viewModel.SaveAsync();
+                    SaveStatus.Text = _viewModel.StatusText;
+                }
+            };
+
+            AuthorizeButton.Click += (s, ev) =>
+            {
+                if (_viewModel != null)
+                {
+                    // Start authorization flow in background; UI will react to ViewModel state changes
+                    _ = _viewModel.AuthorizeAsync();
+                }
+                else
+                {
+                    SaveStatus.Text = "ViewModel unavailable";
+                }
+            };
         }
 
-        private async void AuthorizeButton_Click(object sender, RoutedEventArgs e)
+        private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            // Begin device code flow using the BmwApiService (PKCE)
-            try
+            if (sender is not SettingsViewModel vm) return;
+
+            // When device verification URI is set and polling has started, show the verification dialog
+            if (e.PropertyName == nameof(vm.DeviceVerificationUri) || e.PropertyName == nameof(vm.IsPolling))
             {
-                var api = App.GetService<Bmw.Dashboard.Core.Interfaces.IBmwApiService>();
-                if (api == null)
+                if (!string.IsNullOrEmpty(vm.DeviceVerificationUri) && vm.IsPolling)
                 {
-                    SaveStatus.Text = "API service unavailable";
-                    return;
-                }
-
-                // Generate a code verifier and challenge (PKCE S256)
-                var codeVerifier = GenerateCodeVerifier();
-                var codeChallenge = ComputeCodeChallenge(codeVerifier);
-
-                var deviceCodeResp = await api.GetDeviceCodeAsync(codeChallenge);
-                if (deviceCodeResp == null)
-                {
-                    SaveStatus.Text = "Failed to start authorization";
-                    return;
-                }
-
-                // Create a modal dialog and start background polling; dialog will close automatically when token is retrieved
-                var dialog = CreateVerificationDialog(deviceCodeResp.VerificationUri, deviceCodeResp.UserCode, out var statusText);
-
-                // Start polling for token in background
-                var tokenTask = api.PollForTokenAsync(deviceCodeResp.DeviceCode, codeVerifier, deviceCodeResp.Interval);
-
-                var pv = App.GetService<Bmw.Dashboard.Core.Interfaces.IPasswordVaultService>();
-
-                _ = tokenTask.ContinueWith(t =>
-                {
-                    try
+                    // Ensure UI work runs on dispatcher queue
+                    this.DispatcherQueue.TryEnqueue(async () =>
                     {
-                        if (t.Status == System.Threading.Tasks.TaskStatus.RanToCompletion && t.Result != null)
-                        {
-                            // Save refresh token
-                            try { pv?.SaveTokens(t.Result.RefreshToken ?? string.Empty); } catch { }
+                        // Create dialog and show it while ViewModel polls for token
+                        _verificationDialog = CreateVerificationDialog(vm.DeviceVerificationUri, vm.UserCode, out var statusText);
+                        _verificationDialog.XamlRoot = this.XamlRoot;
+                        await _verificationDialog.ShowAsync();
 
-                            // Update UI and close dialog on UI thread
-                            try
-                            {
-                                dialog.DispatcherQueue.TryEnqueue(() =>
-                                {
-                                    try
-                                    {
-                                        statusText.Text = "Authorized";
-                                        dialog.Hide();
-                                    }
-                                    catch { }
-                                });
-                            }
-                            catch { }
-                        }
-                        else
-                        {
-                            // Polling finished without token (timeout or error) - update status
-                            try
-                            {
-                                dialog.DispatcherQueue.TryEnqueue(() => { try { statusText.Text = "Authorization not completed"; } catch { } });
-                            }
-                            catch { }
-                        }
-                    }
-                    catch { }
-                });
-
-                // Show the dialog modally. It will remain open while polling runs in background.
-                await dialog.ShowAsync();
-
-                // After dialog closes, check token result
-                TokenResponse? token = null;
-                try
-                {
-                    token = tokenTask.Status == System.Threading.Tasks.TaskStatus.RanToCompletion ? tokenTask.Result : null;
+                        // After dialog closes, update save status from ViewModel
+                        SaveStatus.Text = vm.StatusText;
+                    });
                 }
-                catch { }
-
-                if (token == null)
+                else if (!vm.IsPolling && _verificationDialog != null)
                 {
-                    SaveStatus.Text = "Authorization not completed";
-                    return;
+                    // Close dialog when polling ends
+                    this.DispatcherQueue.TryEnqueue(() => _verificationDialog?.Hide());
                 }
-
-                SaveStatus.Text = "Authorized";
-            }
-            catch (Exception ex)
-            {
-                SaveStatus.Text = "Authorization failed";
-                System.Diagnostics.Debug.WriteLine($"Authorize error: {ex.Message}");
             }
         }
 
@@ -242,32 +212,7 @@ namespace BMWConnectedApp.Pages
             return s;
         }
 
-        protected override async void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
-        {
-            base.OnNavigatedTo(e);
-
-            // Use the SettingsService to populate the page so the service maintains a cache
-            var settingsService = App.GetService<ISettingsService>();
-            await settingsService.LoadAsync();
-            UserConfig = settingsService.Current ?? new UserConfigEntity();
-            this.DataContext = this;
-            // Enable the authorize button only if there is a client id
-            AuthorizeButton.IsEnabled = !string.IsNullOrWhiteSpace(UserConfig.ClientId);
-        }
-
-        private async void SaveButton_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                var settingsService = App.GetService<ISettingsService>();
-                await settingsService.SaveAsync(UserConfig);
-                SaveStatus.Text = "Saved";
-            }
-            catch (Exception ex)
-            {
-                SaveStatus.Text = "Save failed";
-                System.Diagnostics.Debug.WriteLine($"Save error: {ex.Message}");
-            }
-        }
+        // Legacy inline settings wiring removed. SettingsPage now uses a DI-resolved SettingsViewModel and
+        // the Save/Authorize handlers are wired in OnNavigatedTo to call into the ViewModel.
     }
 }
