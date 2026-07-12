@@ -1,4 +1,5 @@
-﻿using Bmw.Dashboard.Core.Models.API;
+﻿using Bmw.Dashboard.Core.Data.Entities;
+using Bmw.Dashboard.Core.Models.API;
 
 namespace Bmw.Dashboard.Core.Interfaces;
 
@@ -13,4 +14,5 @@ public interface ISyncService
     Task<string> GetCarData();
     Task<IEnumerable<VehicleMappingResponse>> GetVehicleMappings();
     Task<string?> GetOrFetchVehicleImagePathAsync(string vin);
+    Task<List<ContainerEntity>> GetContainers();
 }

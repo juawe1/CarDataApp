@@ -63,7 +63,7 @@ public partial class App : Application
             services.AddSingleton<DataSyncService>();
             services.AddTransient<DashboardViewModel>();
             // Register SettingsViewModel so pages can resolve it via DI
-            services.AddTransient<Bmw.Dashboard.Core.ViewModels.SettingsViewModel>();
+            services.AddTransient<SettingsViewModel>();
             services.AddTransient<SettingsPage>();
             services.AddSingleton<IPasswordVaultService, PasswordVaultService>();
         }).Build();

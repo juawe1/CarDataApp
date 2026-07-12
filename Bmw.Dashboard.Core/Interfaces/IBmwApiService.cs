@@ -14,4 +14,6 @@ public interface IBmwApiService
     Task<string> GetCarData(string accessToken);
     Task<IEnumerable<VehicleMappingResponse>> GetVehicleMappings(string accessToken);
     Task<byte[]?> GetVehicleImageAsync(string accessToken, string vin);
+    Task<ContainerListResponse> GetContainerListAsync(string accessToken);
+    Task<ContainerResponse> GetContainerDetailsAsync(string accessToken, string containerId);
 }

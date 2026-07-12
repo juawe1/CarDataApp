@@ -1,4 +1,5 @@
-﻿using Bmw.Dashboard.Core.Helpers;
+﻿using Bmw.Dashboard.Core.Data.Entities;
+using Bmw.Dashboard.Core.Helpers;
 using Bmw.Dashboard.Core.Interfaces;
 using Bmw.Dashboard.Core.Models.API;
 
@@ -68,5 +69,20 @@ public class DataSyncService(IBmwApiService api, IPasswordVaultService passwordV
     {
         if (string.IsNullOrWhiteSpace(CachedAccessToken)) return null;
         return await vehicleImageService.GetOrFetchImagePathAsync(CachedAccessToken, vin);
+    }
+
+    public async Task<List<ContainerEntity>> GetContainers() 
+    { 
+        if(string.IsNullOrWhiteSpace(CachedAccessToken)) return new List<ContainerEntity>();
+        var response = await api.GetContainerListAsync(CachedAccessToken);
+        
+        return response.Containers.Select(container => new ContainerEntity
+        {
+            ContainerID = container.ContainerID,
+            ContainerName = container.ContainerName,
+            ContainerPurpose = container.ContainerPurpose,
+            State = container.State,
+            Created = container.Created
+        }).ToList();
     }
 }

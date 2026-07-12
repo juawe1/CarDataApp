@@ -51,6 +51,14 @@ namespace BMWConnectedApp.Pages
                     SaveStatus.Text = "ViewModel unavailable";
                 }
             };
+
+            QueryContainersButton.Click += async (s, ev) =>
+            {
+                if (_viewModel != null)
+                {
+                    ContainersList.ItemsSource = await _viewModel.QueryContainersAsync();
+                }
+            };
         }
 
         private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)

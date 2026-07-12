@@ -259,4 +259,66 @@ public class BmwApiService : IBmwApiService
             return null;
         }
     }
+
+    public async Task<ContainerListResponse> GetContainerListAsync(string accessToken)
+    {
+        var fullUrl = $"{baseUrl}customers/containers";
+        using var request = new HttpRequestMessage(HttpMethod.Get, fullUrl);
+
+        request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {accessToken}");
+        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        request.Headers.Add("x-version", "v1");
+        request.Headers.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) BmwDashboard/1.0");
+        request.Headers.Add("X-Language", "en-GB");
+
+        using var response = await _http.SendAsync(request);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            var result = JsonSerializer.Deserialize<ContainerListResponse>(content, options);
+            return result ?? new ContainerListResponse();
+        }
+        else
+        {
+            var errorBody = await response.Content.ReadAsStringAsync();
+            _logger.LogError("Failed to get container list. Status: {StatusCode}, Body: {ErrorBody}", response.StatusCode, errorBody);
+            throw new Exception($"Failed to get container list. Status: {response.StatusCode}, Body: {errorBody}");
+        }
+    }
+
+    public async Task<ContainerResponse> GetContainerDetailsAsync(string accessToken, string containerId)
+    {
+        var fullUrl = $"{baseUrl}customers/containers/{Uri.EscapeDataString(containerId)}";
+        using var request = new HttpRequestMessage(HttpMethod.Get, fullUrl);
+
+        request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {accessToken}");
+        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        request.Headers.Add("x-version", "v1");
+        request.Headers.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) BmwDashboard/1.0");
+        request.Headers.Add("X-Language", "en-GB");
+
+        using var response = await _http.SendAsync(request);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            var result = JsonSerializer.Deserialize<ContainerResponse>(content, options);
+            return result ?? throw new Exception("Failed to deserialize container details.");
+        }
+        else
+        {
+            var errorBody = await response.Content.ReadAsStringAsync();
+            _logger.LogError("Failed to get container details for {ContainerId}. Status: {StatusCode}, Body: {ErrorBody}", containerId, response.StatusCode, errorBody);
+            throw new Exception($"Failed to get container details for {containerId}. Status: {response.StatusCode}, Body: {errorBody}");
+        }
+    }
 }
